@@ -1,4 +1,6 @@
 name: Build Launcher Binaries
+permissions:
+  contents: write
 
 on:
   push:
