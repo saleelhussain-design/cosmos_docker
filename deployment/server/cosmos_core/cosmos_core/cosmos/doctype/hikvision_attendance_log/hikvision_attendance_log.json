@@ -80,13 +80,13 @@
    "default": 0,
    "fieldname": "is_synced",
    "fieldtype": "Check",
-   "label": "Synced to Checkin",
+   "label": "Synced to Check-in",
    "read_only": 1
   },
   {
    "fieldname": "employee_checkin",
    "fieldtype": "Link",
-   "label": "Employee Checkin",
+   "label": "Employee Check-in",
    "options": "Employee Checkin",
    "read_only": 1
   },

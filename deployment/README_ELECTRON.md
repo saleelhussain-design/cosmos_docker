@@ -27,7 +27,7 @@ This package contains the source code to build a native desktop application for 
 
 ## ⚙️ Configuration
 
-The app points to `http://CosmOS.local:8081` by default. 
+The app points to `http://CosmOS.local:8081` by default.
 If you need to change the target server, edit `main.js` in the `electron_app` directory:
 
 ```javascript
