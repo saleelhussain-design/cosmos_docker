@@ -1,0 +1,3 @@
+[submodule "deployment/client/cosmos_desktop"]
+    path = deployment/client/cosmos_desktop
+    url = https://github.com/saleelhussain-design/cosmos_desktop.git
