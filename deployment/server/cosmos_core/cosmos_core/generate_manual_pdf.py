@@ -2,22 +2,24 @@ import frappe
 from frappe.utils.pdf import get_pdf
 from frappe import _
 
+
 def generate_user_manual_pdf():
-    articles = frappe.get_all("Help Article",
+    articles = frappe.get_all(
+        "Help Article",
         filters={"published": 1},
         fields=["title", "content", "category", "route"],
-        order_by="category asc, title asc"
+        order_by="category asc, title asc",
     )
     if not articles:
         frappe.throw("No published Help Articles found")
-    
+
     chapters = {}
     for a in articles:
         cat = a.category or "General"
         if cat not in chapters:
             chapters[cat] = []
         chapters[cat].append(a)
-    
+
     toc_html = ""
     article_map = {}
     toc_number = 1
@@ -27,7 +29,10 @@ def generate_user_manual_pdf():
         for a in chapters[cat]:
             anchor = f"{cat}-{a.title}".replace(" ", "-").lower()
             article_map[a.route] = anchor
-            toc_html += f'<li style="padding-left:20px;">{toc_number}.{art_num} <a href="#{anchor}">{a.title}</a></li>\n'
+            toc_html += (
+                f'<li style="padding-left:20px;">{toc_number}.{art_num} '
+                f'<a href="#{anchor}">{a.title}</a></li>\n'
+            )
             art_num += 1
         toc_number += 1
 
@@ -36,10 +41,19 @@ def generate_user_manual_pdf():
     for cat in sorted(chapters.keys()):
         art_num = 1
         for a in chapters[cat]:
-            anchor = article_map.get(a.route, f"{cat}-{a.title}".replace(" ", "-").lower())
+            anchor = article_map.get(
+                a.route, f"{cat}-{a.title}".replace(" ", "-").lower()
+            )
             full_content = a.content or ""
-            full_content = full_content.replace('href="/app/', 'href="https://CosmOSerp.com/app/')
-            content_html += f'<div id="{anchor}"><h1 style="page-break-before:always;font-size:20pt;color:#1a5276;border-bottom:3px solid #1a5276;padding-bottom:8px;">{chapter_num}.{art_num} {a.title}</h1>{full_content}</div>\n'
+            full_content = full_content.replace(
+                'href="/app/', 'href="https://CosmOSerp.com/app/'
+            )
+            content_html += (
+                f'<div id="{anchor}"><h1 style="page-break-before:always;'
+                f'font-size:20pt;color:#1a5276;border-bottom:3px solid #1a5276;'
+                f'padding-bottom:8px;">{chapter_num}.{art_num} {a.title}</h1>'
+                f"{full_content}</div>\n"
+            )
             art_num += 1
         chapter_num += 1
 
@@ -76,30 +90,35 @@ a {{ color:#2980b9; }}
   <p>For assistance with CosmOS:</p>
   <ul>
     <li><strong>Email:</strong> support@CosmOSerp.com</li>
-    <li><strong>Issues:</strong> https://github.com/saleelhussain-design/CosmOS_docker/issues</li>
+    <li><strong>Issues:</strong> https://github.com/saleelhussain-design/cosmos_docker/issues</li>
     <li><strong>Manual:</strong> Available in CosmOS User Manual workspace</li>
   </ul>
 </div>
 </body></html>"""
-    
+
     pdf = get_pdf(html)
     filename = f"CosmOS_User_Manual_{frappe.utils.today()}.pdf"
-    
-    existing = frappe.db.get_value("File", {"file_name": ("like", "CosmOS_User_Manual_%.pdf")})
+
+    existing = frappe.db.get_value(
+        "File", {"file_name": ("like", "CosmOS_User_Manual_%.pdf")}
+    )
     if existing:
         frappe.delete_doc("File", existing, ignore_permissions=True, force=True)
-    
-    file_doc = frappe.get_doc({
-        "doctype": "File",
-        "file_name": filename,
-        "content": pdf,
-        "is_private": 0,
-    })
+
+    file_doc = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": filename,
+            "content": pdf,
+            "is_private": 0,
+        }
+    )
     file_doc.save(ignore_permissions=True)
     frappe.db.commit()
     print(f"SUCCESS: {filename}")
     print(f"URL: {file_doc.file_url}")
     return file_doc.file_url
+
 
 if __name__ == "__main__":
     generate_user_manual_pdf()
